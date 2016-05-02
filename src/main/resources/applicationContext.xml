@@ -18,26 +18,52 @@
     <!-- Spring MVC配置 -->
     <context:annotation-config />
     <!--扫描注解 -->
-    <context:component-scan base-package="com.sun.yong.controller" />
+    <!-- <context:component-scan base-package="com.sun.yong.*" /> -->
     <!--默认的mvc注解映射的支持 -->
     <mvc:annotation-driven/>
     <!-- 支持异步方法执行 -->
     <task:annotation-driven /> 
 
-	<bean name="/auth/*" class="com.sun.yong.controller.AuthorityController" />
-	
+    <bean name="/auth/*" class="com.sun.yong.controller.AuthorityController" >
+        <property name="authorityService" ref="authorityService" />
+    </bean>
+    
+    <bean id="authorityService" class="com.sun.yong.business.impl.AuthorityServiceImpl" >
+        <property name="authorityProvider" ref="authorityProvider" />
+    </bean>
+    
+    <bean id="authorityProvider" class="com.sun.yong.business.provider.impl.AuthorityProviderImpl" >
+        <property name="dataService" ref="dataService" />
+    </bean>
+    
+    <bean id="dataService" class="com.sun.yong.dataservice.impl.DataServiceSpringJDBCImpl" >
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+    
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.gjt.mm.mysql.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/sunyongdb?useUnicode=true&amp;characterEncoding=UTF-8" />
+        <property name="username" value="sunyong"></property>
+        <property name="password" value="sunyong"></property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" 
+        abstract="false" lazy-init="false" autowire="default">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
     <!-- 视图解析器和json解析器 -->
-      <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-        <!-- <property name="mediaTypes">
+<!--       <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="mediaTypes">
             <map>
                 <entry key="html" value="text/html"/>
                 <entry key="json" value="application/json"/>
             </map>
-        </property> -->
+        </property>
         <property name="viewResolvers">
             <list>
                 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-                    <property name="prefix" value="/WEB-INF/jsp/" /> <!-- 可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑  -->
+                    <property name="prefix" value="/WEB-INF/jsp/" /> 
                     <property name="suffix" value=".jsp"/>
                 </bean>
             </list>
@@ -47,5 +73,5 @@
                 <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
             </list>
         </property>
-    </bean>
+    </bean> -->
 </beans>
