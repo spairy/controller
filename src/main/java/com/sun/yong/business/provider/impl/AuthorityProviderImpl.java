@@ -20,7 +20,9 @@ public class AuthorityProviderImpl implements IAuthorityProvider {
 	public LoginResponse login(LoginRequest loginRequest, LogIndex logInfo) {
 		LoginResponse loginResponse = new LoginResponse();
 		try {
-			UserInfo userInfo = dataService.getUserInfoByUserName(loginRequest.getUsername());
+			UserInfo userInfo = new UserInfo(); //dataService.getUserInfoByUserName(loginRequest.getUsername());
+			userInfo.setUsername("sunyong");
+			userInfo.setPassword("sunyong");
 			if (userInfo == null || !userInfo.getUsername().equals(loginRequest.getUsername())) {
 				loginResponse.addError(new ErrorInfo("fail", "username"));
 			} else if (!loginRequest.getPassword().equals(userInfo.getPassword())) {

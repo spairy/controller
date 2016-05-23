@@ -25,9 +25,10 @@ public class AuthorityController extends BaseController {
 		this.authorityService = authorityService;
 	}
 
-	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	@ResponseBody
 	public LoginResponse login(HttpServletRequest request, HttpServletResponse responset) {
+		System.out.print("login get");
 		LoginRequest loginRequest = new LoginRequest();
 		loginRequest.setUsername(StringUtils.trimWhitespace(request.getParameter("username")));
 		loginRequest.setPassword(StringUtils.trimWhitespace(request.getParameter("password")));
@@ -37,27 +38,14 @@ public class AuthorityController extends BaseController {
 		return loginResponse;
 	}
 	
-/*	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
 	public LoginResponse loginPost(HttpServletRequest request, HttpServletResponse responset,
 			@RequestBody LoginRequest loginRequest) {
+		System.out.print("login post");
 		LoginResponse loginResponse = null;
-		
-		if (!StringUtils.isEmpty(loginRequest.getUsername()) 
-				&& !StringUtils.isEmpty(loginRequest.getPassword())) {
-				
-			if ("username".equals(loginRequest.getUsername())) {
-				
-			}
-			loginResponse = new LoginResponse();
-			ErrorInfo errorInfo = new ErrorInfo();
-			loginResponse.addError(errorInfo);
-		} else {
-			ErrorInfo errorInfo = new ErrorInfo("ERR_SYS_001");
-			loginResponse.addError(errorInfo);
-		}
-		
-		loginResponse = new LoginResponse();
+		LogIndex logIndex = LogUtils.getLogIndex();
+		loginResponse = authorityService.login(loginRequest, logIndex);
 		return loginResponse;
-	}*/
+	}
 }

@@ -1,36 +1,55 @@
 $(document).ready(function(){
-    $("#sign-up").click(signUp());
-    $("#sign-in").click(signIn());
+    $("#sign-up").click(signUp);
+    $("#sign-in").click(signIn);
 });
 
 function signUp() {
-	var data = $("#sign-form").serialize();
-	var jsonData = $("#sign-form").serializeArray();
-	alert(data);
-	alert(jsonData);
-	alert($("form").serialize());
+	alert(JSON.stringify($("#sign-form").serializeJson()));
+	
     $.ajax({
-	    type: "POST",
-	    url: "/controller/auth/login.do",
-	    data: "{\"username\":\"sunyong\"}",
-	    success: function(msg){
-	        alert( "Data Saved: " + msg );
-	    }
+	    type: "GET",
+	    url: "/auth/login.do",
+	    data: "{}",// data: JSON.stringify($("#sign-form").serializeJson()),
+	    //contentType: "application/json; charset=utf-8", 
+	    success: (function(data){
+	    	alert(data);
+	    	if (null == data.error) {
+		    	$("#sign-form").style.display="on";
+		    	$("#sign-in-div").style.display="none";
+		    	$("#sign-in-span").html=data.username;
+	    	} else {
+	    		$("#sign-in-div").style.display="none";
+		    	$("#sign-in-span").html="login error";
+	    	}
+
+	    }),
+	    complete: (function() {
+    		
+		}),
+		error:(function(err){
+        	
+        }),
+        dataType: "json"
 	});
 }
 
-function signUp() {
-	var data = $("#sign-form").serialize();
-	var jsonData = $("#sign-form").serializeArray();
-	alert(data);
-	alert(jsonData);
-	alert($("form").serialize());
-    $.ajax({
+function signIn() {
+	alert($("#sign-form").serializeJson());
+	$.ajax({
 	    type: "POST",
-	    url: "/controller/auth/login.do",
-	    data: "{\"username\":\"sunyong\"}",
-	    success: function(msg){
-	        alert( "Data Saved: " + msg );
+	    url: "/auth/login.do",
+	    data: "{}",
+	    contentType: "application/json; charset=utf-8", 
+	    success: function(data){
+	    	alert(data);
+	    	if (null == data.error) {
+		    	$("#sign-form").style.display="on";
+		    	$("#sign-in-div").style.display="none";
+		    	$("#sign-in-span").html=data.username;
+	    	} else {
+	    		$("#sign-in-div").style.display="none";
+		    	$("#sign-in-span").html="login error";
+	    	}
 	    }
 	});
 }

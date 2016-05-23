@@ -1,15 +1,19 @@
 function doSubmit(){
 	var data = $("#post-form").serialize();
-    var jsonData = $("#post-form").serializeArray();
-	alert(data);
-	alert(jsonData);
+    var jsonData = $("#post-form").serializeJson();
+	//alert(data);
+    JSON.stringify(jsonData);
+	alert(JSON.stringify(jsonData));
+	//alert(serializeNodeToJson("sign-div"));
 	
-    /*$.ajax({
+    $.ajax({
 	    type: "POST",
 	    url: "/controller/auth/login.do",
-	    data: "username="+$("#username-ajax").val()+"&password="+$("#password-ajax").val(),
+	    contentType: "application/json; charset=utf-8", 
+	    data:  JSON.stringify(jsonData),
+	    dataType: "json",
 	    success: function(msg){
-	        alert( "Data Saved: " + msg.errors[0].errorCode );
+	        alert( JSON.stringify(msg) );
 	    }
-	});*/
+	});
 }
