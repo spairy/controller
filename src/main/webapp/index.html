@@ -40,8 +40,8 @@
             <div class="form-group">
               <input type="password" name="password" placeholder="Password" class="form-control">
             </div>
-            <button id="sign-in" type="submit" class="btn btn-success">登录</button>
-            <button id="sign-up" type="submit" class="btn btn-success">注册</button>
+            <button id="sign-in" type="button" class="btn btn-success" onclick="signIn()">登录</button>
+            <button id="sign-up" type="button" class="btn btn-success">注册</button>
           </form>
           <div id="sign-in-div" class="navbar-right" style="display: none">
               <span id="sign-in-span"> </span>
@@ -96,5 +96,6 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
     <script src="static/js/main.js"></script>
+    <script src="static/js/utils.js"></script>
 </body>
 </html>

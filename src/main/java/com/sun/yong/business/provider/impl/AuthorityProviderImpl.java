@@ -35,7 +35,7 @@ public class AuthorityProviderImpl implements IAuthorityProvider {
 				loginResponse.setBirthYear(userInfo.getBirthYear());
 				loginResponse.setBirthMonth(userInfo.getBirthMonth());
 				loginResponse.setBirthDay(userInfo.getBirthDay());
-				loginResponse.setIdentity(userInfo.getIdentity().getValue());
+				loginResponse.setIdentity(null == userInfo.getIdentity() ? "" : userInfo.getIdentity().getValue());
 			}
 		} catch (Exception e) {
 			loginResponse.addError(new ErrorInfo("system error","provider"));

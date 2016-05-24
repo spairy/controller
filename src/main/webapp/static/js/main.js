@@ -1,16 +1,17 @@
-$(document).ready(function(){
-    $("#sign-up").click(signUp);
-    $("#sign-in").click(signIn);
-});
-
+/*$(document).ready(function(){
+   // $("#sign-up").click(signUp);
+   // $("#sign-in").click(signIn);
+});*/
+/*
 function signUp() {
 	alert(JSON.stringify($("#sign-form").serializeJson()));
 	
-    $.ajax({
-	    type: "GET",
-	    url: "/auth/login.do",
-	    data: "{}",// data: JSON.stringify($("#sign-form").serializeJson()),
-	    //contentType: "application/json; charset=utf-8", 
+	$.ajax({
+	    type: "POST",
+	    url: "/controller/auth/login.do",
+	    contentType: "application/json; charset=utf-8", 
+	    data:  JSON.stringify($("#sign-form").serializeJson()),
+	    dataType: "json",
 	    success: (function(data){
 	    	alert(data);
 	    	if (null == data.error) {
@@ -28,29 +29,34 @@ function signUp() {
 		}),
 		error:(function(err){
         	
-        }),
-        dataType: "json"
+        })
 	});
-}
+}*/
 
 function signIn() {
-	alert($("#sign-form").serializeJson());
 	$.ajax({
 	    type: "POST",
-	    url: "/auth/login.do",
-	    data: "{}",
-	    contentType: "application/json; charset=utf-8", 
-	    success: function(data){
-	    	alert(data);
-	    	if (null == data.error) {
-		    	$("#sign-form").style.display="on";
-		    	$("#sign-in-div").style.display="none";
-		    	$("#sign-in-span").html=data.username;
+	    url: "/controller/auth/login.do",
+	    contentType: "application/json; charset=utf-8",
+	    data:  JSON.stringify($("#sign-form").serializeJson()),
+	    dataType: "json",
+	    success: function(data) {
+	    	if (isNot(data.errors)) {
+		    	$("#sign-form").hide();
+		    	$("#sign-in-div").show();
+		    	alert(data.username);
+		    	$("#sign-in-span").html(data.username);
 	    	} else {
-	    		$("#sign-in-div").style.display="none";
-		    	$("#sign-in-span").html="login error";
+	    		$("#sign-in-div").show();
+		    	$("#sign-in-span").html("login error");
 	    	}
-	    }
+	    },
+	    complete: function() {
+
+		},
+		error:function(err) {
+
+        }
 	});
 }
 

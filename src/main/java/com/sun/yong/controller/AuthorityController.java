@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sun.yong.business.IAuthorityService;
-import com.sun.yong.common.entity.common.ErrorInfo;
 import com.sun.yong.common.entity.common.LogIndex;
 import com.sun.yong.common.entity.request.LoginRequest;
 import com.sun.yong.common.entity.response.LoginResponse;
@@ -25,7 +24,7 @@ public class AuthorityController extends BaseController {
 		this.authorityService = authorityService;
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
+/*	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	@ResponseBody
 	public LoginResponse login(HttpServletRequest request, HttpServletResponse responset) {
 		System.out.print("login get");
@@ -36,11 +35,11 @@ public class AuthorityController extends BaseController {
 		LogIndex logIndex = LogUtils.getLogIndex();
 		loginResponse = authorityService.login(loginRequest, logIndex);
 		return loginResponse;
-	}
+	}*/
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
-	public LoginResponse loginPost(HttpServletRequest request, HttpServletResponse responset,
+	public LoginResponse login(HttpServletRequest request, HttpServletResponse responset,
 			@RequestBody LoginRequest loginRequest) {
 		System.out.print("login post");
 		LoginResponse loginResponse = null;
