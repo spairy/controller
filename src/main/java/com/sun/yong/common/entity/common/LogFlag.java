@@ -1,6 +1,6 @@
 package com.sun.yong.common.entity.common;
 
-public class LogIndex {
+public class LogFlag {
 
 	private String serialNumber;
 

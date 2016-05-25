@@ -1,5 +1,5 @@
 package com.sun.yong.common.utils;
 
-public class Security {
+public class SecurityUtils {
 
 }

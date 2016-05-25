@@ -8,7 +8,7 @@ import com.sun.yong.common.entity.request.LoginRequest;
 import com.sun.yong.common.entity.response.LoginResponse;
 import com.sun.yong.dataservice.IDataServiceSpringJDBC;
 
-public class AuthorityProviderImpl implements IAuthorityProvider {
+public class ChatProviderImpl implements IAuthorityProvider {
 
 	private IDataServiceSpringJDBC dataService;
 	

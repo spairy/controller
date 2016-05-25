@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 import com.sun.yong.business.IAuthorityService;
 import com.sun.yong.business.provider.IAuthorityProvider;
 import com.sun.yong.common.entity.common.ErrorInfo;
-import com.sun.yong.common.entity.common.LogIndex;
+import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.request.LoginRequest;
 import com.sun.yong.common.entity.response.LoginResponse;
 
@@ -19,7 +19,7 @@ public class AuthorityServiceImpl implements IAuthorityService {
 	}
 
 	@Override
-	public LoginResponse login(final LoginRequest loginRequest, final LogIndex logInfo) {
+	public LoginResponse login(final LoginRequest loginRequest, final LogFlag logFlag) {
 		LoginResponse loginResponse = null; 
 		if (StringUtils.isEmpty(loginRequest.getUsername())) {
 			if (null == loginResponse) {
@@ -34,7 +34,7 @@ public class AuthorityServiceImpl implements IAuthorityService {
 			loginResponse.addError(new ErrorInfo("empty","password"));
 		}
 		if (loginResponse == null || CollectionUtils.isEmpty(loginResponse.getErrors())) {
-			loginResponse = authorityProvider.login(loginRequest, logInfo);
+			loginResponse = authorityProvider.login(loginRequest, logFlag);
 		}
 		return loginResponse;
 	}
