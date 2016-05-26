@@ -60,6 +60,7 @@
 			writeToScreen("Alrady connect, please not re-connect");
 		}
 	}
+	
 	function initWebSocket() {
 		window.WebSocket = window.WebSocket || window.MozWebSocket;
 		//if ('WebSocket' in window || 'MozWebSocket' in window)
@@ -77,9 +78,9 @@
 		    };
 		} else {
 			alert("WebSockets not supported on your browser.");
-			return;
 		}
 	}
+	
 	function onOpen(evt) {
 		//called as soon as a connection is opened
 		if(websocket.readyState == WebSocket.OPEN){
