@@ -9,8 +9,7 @@ import javax.websocket.server.ServerEndpointConfig;
  * @author du.chen
  *
  */
-public class GetHttpSessionConfigurator extends
-		ServerEndpointConfig.Configurator {
+public class GetHttpSessionConfigurator extends ServerEndpointConfig.Configurator {
 
 	/**
 	 * Set HttpSession information from open websocket

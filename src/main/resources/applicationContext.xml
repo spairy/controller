@@ -27,12 +27,21 @@
     <bean name="/auth/*" class="com.sun.yong.controller.AuthorityController" >
         <property name="authorityService" ref="authorityService" />
     </bean>
+    <bean class="com.sun.yong.chendu.ChatJDKSocket" >
+        <property name="chatService" ref="chatService" />
+    </bean>
     
     <bean id="authorityService" class="com.sun.yong.business.impl.AuthorityServiceImpl" >
         <property name="authorityProvider" ref="authorityProvider" />
     </bean>
+    <bean id="chatService" class="com.sun.yong.business.impl.ChatServiceImpl" >
+        <property name="chatProvider" ref="chatProvider" />
+    </bean>
     
     <bean id="authorityProvider" class="com.sun.yong.business.provider.impl.AuthorityProviderImpl" >
+        <property name="dataService" ref="dataService" />
+    </bean>
+    <bean id="chatProvider" class="com.sun.yong.business.provider.impl.ChatProviderImpl" >
         <property name="dataService" ref="dataService" />
     </bean>
     

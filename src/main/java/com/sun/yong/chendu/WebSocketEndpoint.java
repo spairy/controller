@@ -16,6 +16,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.yong.common.entity.request.MessageRequest;
 
 //http://www.myexception.cn/web/1997640.html
 //è¯¥æ³¨è§£ç”¨æ�¥æŒ‡å®šä¸€ä¸ªURI,å®¢æˆ·ç«¯å�¯ä»¥é€šè¿‡è¿™ä¸ªURIæ�¥è¿žæŽ¥åˆ°WebSocket,ç±»ä¼¼Servletçš„æ³¨è§£mapping,æ— éœ€åœ¨web.xmlä¸­é…�ç½®.
@@ -55,7 +56,7 @@ public class WebSocketEndpoint {
 
 		addOnlineCount();
 
-		MessageEvent event  = new MessageEvent("SYSTEM", this.from, "LOGIN_WELCOME");
+		MessageRequest event  = new MessageRequest();//"SYSTEM", this.from, "LOGIN_WELCOME");
 		event.setContent("WELCOME! You can send message to " + (null == this.to ? "All" : this.to));
 		String packagedMsg = new ObjectMapper().writeValueAsString(event);
 
@@ -143,7 +144,7 @@ public class WebSocketEndpoint {
 					//å½“å‰�ç”¨æˆ·é€€å‡º,toä¹Ÿå·²ç»�æŽ‰çº¿æˆ–è€…ä¸�å�¯è¾¾
 					if(from != null){
 						//åˆ›å»ºç”¨æˆ·ä¸�åœ¨çº¿é€šçŸ¥
-						MessageEvent event  = new MessageEvent("SYSTEM", this.from, "MEMBER_NOT_LOGIN");
+						MessageRequest event  = new MessageRequest();//"SYSTEM", this.from, "MEMBER_NOT_LOGIN");
 						event.setContent("["+ new Date() +"]."+ this.to +" å½“å‰�ä¸�åœ¨çº¿,ä¼šåœ¨ä¸Šçº¿å�ŽæŽ¨é€�.");
 						String packagedMsg = new ObjectMapper().writeValueAsString(event);
 						//å¹¿æ’­ç»™è‡ªå·±
@@ -162,10 +163,9 @@ public class WebSocketEndpoint {
 	@OnMessage
 	public void onMessage(String jsonMessage) throws IOException {
 		System.out.println("send message:" + jsonMessage);
-		MessageEvent event = new ObjectMapper().readValue(jsonMessage, MessageEvent.class);
-		event.setFrom(this.from);
-		event.setTo(this.to);
-		event.setSendDate(new Date());
+		MessageRequest event = new ObjectMapper().readValue(jsonMessage, MessageRequest.class);
+		//event.setFrom(this.from);
+		//event.setTo(this.to);
 		String packageMessage = new ObjectMapper().writeValueAsString(event);
 		broadcastMessage(this.from, this.to, packageMessage);
 	}
@@ -188,7 +188,7 @@ public class WebSocketEndpoint {
 		//æ›´æ–°åœ¨çº¿äººæ•°
 		subOnlineCount();
 		//åˆ›å»ºç”¨æˆ·ç¦»çº¿é€šçŸ¥
-		MessageEvent event  = new MessageEvent("SYSTEM", this.to, "MEMBER_OFFLINE");
+		MessageRequest event  = new MessageRequest();//"SYSTEM", this.to, "MEMBER_OFFLINE");
 		event.setContent("["+ new Date() +"]."+ this.from +" å·²ç»�ä¸‹çº¿.");
 		String packagedMsg = new ObjectMapper().writeValueAsString(event);
 		//å°†ä¸‹çº¿æ¶ˆæ�¯å�‘é€�ç»™å¯¹è¯�çš„äºº

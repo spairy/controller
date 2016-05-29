@@ -1,7 +1,6 @@
 package com.sun.yong.chendu;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
@@ -12,21 +11,52 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.yong.business.IChatService;
+import com.sun.yong.business.impl.ChatServiceImpl;
+import com.sun.yong.common.Constant;
+import com.sun.yong.common.entity.common.LogFlag;
+import com.sun.yong.common.entity.common.UserSession;
+import com.sun.yong.common.entity.request.MessageRequest;
+import com.sun.yong.common.utils.DateUtils;
+import com.sun.yong.common.utils.LogUtils;
 
 @ServerEndpoint(value = "/chatJDK", configurator = GetHttpSessionConfigurator.class)
 public class ChatJDKSocket {
 
+	private IChatService chatService;
+	
+	private LogFlag logFlag;
+	
     private static int onlineCount = 0;
-	private static final ConcurrentHashMap<String, ChatJDKSocket> memberSessionMap = new ConcurrentHashMap<String, ChatJDKSocket>();
+	private static final ConcurrentHashMap<String, ChatJDKSocket> memberSessionMap = 
+			new ConcurrentHashMap<String, ChatJDKSocket>();
+	
 	private Session session;
 	private HttpSession httpSession;
-	private String from;
-	private String to;
+	private UserSession userSession;
+
+	public Session getSession() {
+		return session;
+	}
 	
+	public void setChatService(IChatService chatService) {
+		this.chatService = chatService;
+	}  
+
+	public UserSession getUserSession() {
+		return userSession;
+	}
+
+	public void setUserSession(UserSession userSession) {
+		this.userSession = userSession;
+	}
+
 	/**
 	 * A connection is open
 	 *
@@ -34,121 +64,75 @@ public class ChatJDKSocket {
 	 * @param config
 	 * @throws IOException
 	 */
+	@SuppressWarnings("resource")
 	@OnOpen
-	public void onOpen(Session session, EndpointConfig config, @PathParam("msgTo") String msgTo) throws IOException {
+	public void onOpen(Session session, EndpointConfig config) throws IOException {
+		logFlag = LogUtils.getLogFlag();;
 		this.session = session;
 		this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-		this.from = (String) httpSession.getAttribute("LOGIN_USER");
-		this.to = msgTo;
-
-		memberSessionMap.put(this.from +"||" +this.to, this);
-
-		//mappingConversation(this.from, this.to);
-
+		this.userSession = (UserSession) httpSession.getAttribute(Constant.USER_SESSION_KEY);
+		if (null == userSession) {
+			onError(session, new Throwable("User is not login!"));
+			return;
+		}
+		
+		ApplicationContext ac = new FileSystemXmlApplicationContext("classpath:applicationContext.xml");
+		chatService = (ChatServiceImpl) ac.getBean("chatService");
+		
+		memberSessionMap.put(userSession.getMemberID(), this);
 		addOnlineCount();
 
-		MessageEvent event  = new MessageEvent("SYSTEM", this.from, "LOGIN_WELCOME");
-		event.setContent("WELCOME! You can send message to " + (null == this.to ? "All" : this.to));
-		String packagedMsg = new ObjectMapper().writeValueAsString(event);
-
-		broadcastMessage(this.from, this.to, packagedMsg, true);
+		MessageEventRequest messageEventRequest = new MessageEventRequest();
+		messageEventRequest.setFromMemberID("10000001");
+		messageEventRequest.setToMemberID(userSession.getMemberID());
+		messageEventRequest.setContent("WELCOME! You can send message others!");
+		messageEventRequest.setSend(Boolean.FALSE);
+		broadcastMessage(messageEventRequest);
 	}
-	/*
-	private void mappingConversation(String from, String to){
-		//from -> to
-		CopyOnWriteArraySet<String> fromConversation = null;
-		if(conversationMap.get(from) == null){
-			conversationMap.put(from, new CopyOnWriteArraySet<String>());
-		}
-		fromConversation = conversationMap.get(from);
-		fromConversation.add(to);
-		//to -> from
-		CopyOnWriteArraySet<String> toConversation = null;
-		if(conversationMap.get(to) == null){
-			conversationMap.put(to, new CopyOnWriteArraySet<String>());
-		}
-		toConversation = conversationMap.get(to);
-		toConversation.add(from);
-	}
-	*/
-	/*private ArrayList<WebSocketEndpoint> searchforSession(WebSocketEndpoint wse){
-		ArrayList<WebSocketEndpoint> list = new ArrayList<WebSocketEndpoint>();
-		list.add(this);
-		WebSocketEndpoint toWse = memberSessinMap.get(wse.getTo());
-		if(toWse != null){
-			list.add(toWse);
-			Session toSession = toWse.getSession();
-			ArrayList<WebSocketEndpoint> subList = new ArrayList<WebSocketEndpoint>();
-			subList.add(this);
-			subList.add(toWse);
-			storeMap.put(toSession.getId(), subList);
-		}
-		return list;
-	}*/
 	
-	private void broadcastMessage(String from, String to, String message) throws IOException{
-		broadcastMessage(from, to, message, false);
-	}
-	private void broadcastMessage(String from, String to, String message, boolean isFirstLogin)
-			throws IOException {
-		System.out.println("####online count:" + ChatJDKSocket.onlineCount);
-		for(ConcurrentHashMap.Entry<String, ChatJDKSocket> member: memberSessionMap.entrySet()){
-			ChatJDKSocket wse = member.getValue();
-			Session sessionX = wse.getSession();
-			System.out.print(member.getKey() +" | ");
-			System.out.print(member.getValue() +" | ");
-			System.out.print(sessionX.getId() +" | ");
-			System.out.print(wse.getFrom() +" | ");
-			System.out.println(wse.getTo());
-		}
-		System.out.println("isFirstLogin="+isFirstLogin);
-		System.out.println("from="+from);
-		System.out.println("to="+to);
-		System.out.println("message="+message);
-		System.out.println("memberSessionMap.get(to)=" + (memberSessionMap.get(to)==null));
-		System.out.println("#################### è°ƒè¯•ä¿¡æ�¯ç»“æ�Ÿ #################");
+	private void broadcastMessage(MessageEventRequest messageEventRequest) throws IOException {
+		System.out.println("Enter broadcastMessage.");
 		
-		if(!isFirstLogin){
-			if("ALL".equals(to)){
-				for(ConcurrentHashMap.Entry<String, ChatJDKSocket> member: memberSessionMap.entrySet()){
-					Session sessionX = member.getValue().getSession();
-					if((isFirstLogin && sessionX != this.session) || !isFirstLogin){
-						sessionX.getBasicRemote().sendText(message);
-					}
-				}
-			}else{
-				if(memberSessionMap.get(to + "||" + from) != null){
-					ChatJDKSocket wse = memberSessionMap.get(to + "||" + from);
-					Session sessionX = wse.getSession();
-					sessionX.getBasicRemote().sendText(message);
-					if(from != null){
-						ChatJDKSocket wseF = memberSessionMap.get(from + "||" + to);
-						wseF.getSession().getBasicRemote().sendText(message);
-					}
-				}else{
-					if(from != null){
-						MessageEvent event  = new MessageEvent("SYSTEM", this.from, "MEMBER_NOT_LOGIN");
-						event.setContent("["+ new Date() +"]."+ this.to +" å½“å‰�ä¸�åœ¨çº¿,ä¼šåœ¨ä¸Šçº¿å�ŽæŽ¨é€�.");
-						String packagedMsg = new ObjectMapper().writeValueAsString(event);
-						ChatJDKSocket wseF = memberSessionMap.get(from + "||" + to);
-						wseF.getSession().getBasicRemote().sendText(packagedMsg);
-					}
-				}
-			}
-		}else{
-			this.getSession().getBasicRemote().sendText(message);
+		String dateTime = DateUtils.getCurrentDateTime();
+		
+		MessageRequest messageRequest = new MessageRequest();
+		messageRequest.setFromMemberID(messageEventRequest.getFromMemberID());
+		messageRequest.setToMemberID(messageEventRequest.getToMemberID());
+		messageRequest.setContent(messageEventRequest.getContent());
+		messageRequest.setSend(messageEventRequest.isSend());
+		messageRequest.setDateTime(dateTime);
+		chatService.insertMessage(messageRequest, logFlag);
+		
+		MessageEventResponse messageEventResponse = new MessageEventResponse();
+		if ("10000001".equalsIgnoreCase(messageEventRequest.getFromMemberID())) {
+			messageEventResponse.setFromUsername("SYSTEM");
+		} else {
+			messageEventResponse.setFromUsername(userSession.getUsername());
+		}
+		messageEventResponse.setContent(messageRequest.getContent());
+		messageEventResponse.setDateTime(dateTime);
+		if (null != memberSessionMap.get(messageEventRequest.getToMemberID())){
+			messageEventResponse.setToUsername(memberSessionMap.get(messageEventRequest.getToMemberID()).getUserSession().getUsername());
+		}
+		
+		String message = new ObjectMapper().writeValueAsString(messageEventResponse);
+		sendMessage(messageEventRequest.getFromMemberID(), message);
+		sendMessage(messageEventRequest.getToMemberID(), message);
+	}
+	
+	private void sendMessage(String memberID, String message) throws IOException {
+		if (null != memberSessionMap.get(memberID)){
+			memberSessionMap.get(memberID).getSession().getBasicRemote().sendText(message);
 		}
 	}
 
 	@OnMessage
 	public void onMessage(String jsonMessage) throws IOException {
 		System.out.println("send message:" + jsonMessage);
-		MessageEvent event = new ObjectMapper().readValue(jsonMessage, MessageEvent.class);
-		event.setFrom(this.from);
-		event.setTo(this.to);
-		event.setSendDate(new Date());
-		String packageMessage = new ObjectMapper().writeValueAsString(event);
-		broadcastMessage(this.from, this.to, packageMessage);
+		MessageEventRequest messageEventRequest = 
+				new ObjectMapper().readValue(jsonMessage, MessageEventRequest.class);
+		messageEventRequest.setFromMemberID(userSession.getMemberID());
+		broadcastMessage(messageEventRequest);
 	}
 
 	/**
@@ -167,15 +151,26 @@ public class ChatJDKSocket {
 			}
 		}
 		subOnlineCount();
-		MessageEvent event  = new MessageEvent("SYSTEM", this.to, "MEMBER_OFFLINE");
-		event.setContent("["+ new Date() +"]."+ this.from +" å·²ç»�ä¸‹çº¿.");
-		String packagedMsg = new ObjectMapper().writeValueAsString(event);
-		broadcastMessage(null, this.to, packagedMsg);
+		MessageEventRequest messageEventRequest = new MessageEventRequest();
+		messageEventRequest.setFromMemberID("10000001");
+		messageEventRequest.setToMemberID(userSession.getMemberID());
+		messageEventRequest.setContent("On Close!");
+		messageEventRequest.setSend(Boolean.FALSE);
+		broadcastMessage(messageEventRequest);
 	}
 
 	@OnError
-	public void onError(Session session, Throwable t) {
-		System.out.println("*********************************************************");
+	public void onError(Session session, Throwable t) throws IOException {
+		System.out.println("Enter on Error method.");
+		System.out.println(t.getMessage());
+		
+		MessageEventRequest messageEventRequest = new MessageEventRequest();
+		messageEventRequest.setFromMemberID("10000001");
+		messageEventRequest.setToMemberID(userSession.getMemberID());
+		messageEventRequest.setContent("On Error!");
+		messageEventRequest.setSend(Boolean.FALSE);
+		broadcastMessage(messageEventRequest);
+		
 		t.printStackTrace();
 	}
 	
@@ -185,35 +180,11 @@ public class ChatJDKSocket {
  
     public static synchronized void addOnlineCount() {
     	ChatJDKSocket.onlineCount++;
-    	System.out.println("å½“å‰�ç”¨æˆ·ä¸ªæ•°" + ChatJDKSocket.getOnlineCount());
+    	System.out.println("On line member number is: " + ChatJDKSocket.getOnlineCount());
     }
      
     public static synchronized void subOnlineCount() {
     	ChatJDKSocket.onlineCount--;
-    	System.out.println("å½“å‰�ç”¨æˆ·ä¸ªæ•°" + ChatJDKSocket.getOnlineCount());
+    	System.out.println("On line member number is: " + ChatJDKSocket.getOnlineCount());
     }
-
-	public Session getSession() {
-		return session;
-	}
-
-	public void setSession(Session session) {
-		this.session = session;
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
-	public String getTo() {
-		return to;
-	}
-
-	public void setTo(String to) {
-		this.to = to;
-	}
 }

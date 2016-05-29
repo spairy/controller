@@ -8,6 +8,14 @@ public class BaseException extends Exception {
 	
 	protected String errorMessage;
 
+	public BaseException () {
+	}
+	
+	public BaseException (String errorCode, String errorMessage) {
+		this.errorCode = errorCode;
+		this.errorMessage = errorMessage;
+	}
+	
 	public String getErrorCode() {
 		return errorCode;
 	}

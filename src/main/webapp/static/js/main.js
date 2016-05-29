@@ -44,7 +44,6 @@ function signIn() {
 	    	if (isNot(data.errors)) {
 		    	$("#sign-form").hide();
 		    	$("#sign-in-div").show();
-		    	alert(data.username);
 		    	$("#sign-in-span").html(data.username);
 	    	} else {
 	    		$("#sign-in-div").show();
