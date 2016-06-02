@@ -38,4 +38,21 @@ public class ChatJDKController extends BaseController {
 		}
 		return createChatResponse;
 	}
+	
+	@RequestMapping(value = "/getFriends", method = RequestMethod.POST)
+	@ResponseBody
+	public CreateChatResponse getFriends(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody CreateChatRequest CreateChatRequest) {
+		System.out.print("createChat post");
+		LogFlag logFlag = LogUtils.getLogFlag();
+		CreateChatResponse createChatResponse = null;
+		UserSession userSession = SessionUtils.getUserSession(request, response);
+		if (null != userSession) {
+			createChatResponse = chatService.createChat(CreateChatRequest, logFlag);
+		} else {
+			createChatResponse = new CreateChatResponse();
+			createChatResponse.addError(new ErrorInfo("not login!"));
+		}
+		return createChatResponse;
+	}
 }

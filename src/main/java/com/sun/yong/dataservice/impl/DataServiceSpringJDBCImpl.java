@@ -6,11 +6,13 @@ import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import com.sun.yong.common.entity.model.Friend;
 import com.sun.yong.common.entity.model.Message;
 import com.sun.yong.common.entity.model.UserInfo;
 import com.sun.yong.common.exception.DateServiceException;
 import com.sun.yong.dataservice.IDataServiceSpringJDBC;
 import com.sun.yong.dataservice.SQLConstant;
+import com.sun.yong.dataservice.mapper.FriendRowMapper;
 import com.sun.yong.dataservice.mapper.UserInfoRowMapper;
 
 public class DataServiceSpringJDBCImpl implements IDataServiceSpringJDBC {
@@ -35,7 +37,31 @@ public class DataServiceSpringJDBCImpl implements IDataServiceSpringJDBC {
 		}
 		return userInfo;
 	}
+	
+	@Override
+	public UserInfo getUserInfoByMemberId(String memberId) throws DateServiceException {
+		UserInfo userInfo = null;
+		List<UserInfo> userInfoList = 
+				jdbcTemplate.query(SQLConstant.SQL_GET_USERINFO_BY_MEMBERID, 
+						new Object[]{memberId}, new UserInfoRowMapper());
+		if (!CollectionUtils.isEmpty(userInfoList)) {
+			userInfo = userInfoList.get(0);
+		}
+		return userInfo;
+	}
 
+	@Override
+	public Friend getFriendByMemberId(String memberId) throws DateServiceException {
+		Friend friend = null;
+		List<Friend> friendList = 
+				jdbcTemplate.query(SQLConstant.SQL_GET_FRIEND_BY_MEMBERID, 
+						new Object[]{memberId}, new FriendRowMapper());
+		if (!CollectionUtils.isEmpty(friendList)) {
+			friend = friendList.get(0);
+		}
+		return friend;
+	}
+	
 	@Override
 	public void insertMessage(Message message) throws DateServiceException {
 		Object[] o = new Object[] {getDateBaseLineID(),
@@ -58,6 +84,18 @@ public class DataServiceSpringJDBCImpl implements IDataServiceSpringJDBC {
 		if (n <= 0) {
 			throw new DateServiceException("n <= 0", "update fail");
 		}
+	}
+
+	@Override
+	public UserInfo getUser(String memberId) throws DateServiceException {
+		UserInfo userInfo = null;
+		List<UserInfo> userInfoList = 
+				jdbcTemplate.query(SQLConstant.SQL_GET_USERINFO_BY_USERNAME, 
+						new Object[]{memberId}, new UserInfoRowMapper());
+		if (!CollectionUtils.isEmpty(userInfoList)) {
+			userInfo = userInfoList.get(0);
+		}
+		return userInfo;
 	}
 
 }

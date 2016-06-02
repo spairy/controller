@@ -17,12 +17,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.yong.business.IAuthorityService;
 import com.sun.yong.business.IChatService;
+import com.sun.yong.business.impl.AuthorityServiceImpl;
 import com.sun.yong.business.impl.ChatServiceImpl;
 import com.sun.yong.common.Constant;
 import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.common.UserSession;
 import com.sun.yong.common.entity.request.MessageRequest;
+import com.sun.yong.common.entity.response.UserResponse;
 import com.sun.yong.common.utils.DateUtils;
 import com.sun.yong.common.utils.LogUtils;
 
@@ -30,6 +33,8 @@ import com.sun.yong.common.utils.LogUtils;
 public class ChatJDKSocket {
 
 	private IChatService chatService;
+	
+	private IAuthorityService authorityService;
 	
 	private LogFlag logFlag;
 	
@@ -78,6 +83,9 @@ public class ChatJDKSocket {
 		
 		ApplicationContext ac = new FileSystemXmlApplicationContext("classpath:applicationContext.xml");
 		chatService = (ChatServiceImpl) ac.getBean("chatService");
+		authorityService = (AuthorityServiceImpl) ac.getBean("authorityService");
+		
+		UserResponse userResponse = authorityService.getUser(userSession.getMemberID(), logFlag);
 		
 		memberSessionMap.put(userSession.getMemberID(), this);
 		addOnlineCount();
@@ -85,7 +93,7 @@ public class ChatJDKSocket {
 		MessageEventRequest messageEventRequest = new MessageEventRequest();
 		messageEventRequest.setFromMemberID("10000001");
 		messageEventRequest.setToMemberID(userSession.getMemberID());
-		messageEventRequest.setContent("WELCOME! You can send message others!");
+		messageEventRequest.setContent(new ObjectMapper().writeValueAsString(userResponse));
 		messageEventRequest.setSend(Boolean.FALSE);
 		broadcastMessage(messageEventRequest);
 	}

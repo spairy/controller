@@ -9,6 +9,7 @@ import com.sun.yong.common.entity.common.ErrorInfo;
 import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.request.LoginRequest;
 import com.sun.yong.common.entity.response.LoginResponse;
+import com.sun.yong.common.entity.response.UserResponse;
 
 public class AuthorityServiceImpl implements IAuthorityService {
 
@@ -37,6 +38,21 @@ public class AuthorityServiceImpl implements IAuthorityService {
 			loginResponse = authorityProvider.login(loginRequest, logFlag);
 		}
 		return loginResponse;
+	}
+
+	@Override
+	public UserResponse getUser(String memberId, LogFlag logFlag) {
+		UserResponse userResponse = null; 
+		if (StringUtils.isEmpty(memberId)) {
+			if (null == userResponse) {
+				userResponse = new UserResponse();
+			}
+			userResponse.addError(new ErrorInfo("empty","memberId"));
+		}
+		if (userResponse == null || CollectionUtils.isEmpty(userResponse.getErrors())) {
+			userResponse = authorityProvider.getUser(memberId, logFlag);
+		}
+		return userResponse;
 	}
 
 }
