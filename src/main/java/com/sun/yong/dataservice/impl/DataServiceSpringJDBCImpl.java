@@ -61,6 +61,15 @@ public class DataServiceSpringJDBCImpl implements IDataServiceSpringJDBC {
 		}
 		return friend;
 	}
+	@Override
+	public void insertUser(UserInfo userInfo) throws DateServiceException {
+		Object[] o = new Object[] {
+		};
+		int n = jdbcTemplate.update(SQLConstant.SQL_INSERT_MESSAGE, o);
+		if (n <= 0) {
+			throw new DateServiceException("n <= 0", "insert fail");
+		}
+	}
 	
 	@Override
 	public void insertMessage(Message message) throws DateServiceException {

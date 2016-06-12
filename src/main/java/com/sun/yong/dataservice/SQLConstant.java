@@ -9,7 +9,10 @@ public class SQLConstant {
 			"SELECT memberID, username, password, surname, name, birthYear, birthMonth, birthDay, identity From user Where memberID = ?";
 	
 	public final static String SQL_GET_FRIEND_BY_MEMBERID = 
-			"SELECT friendID, memberID, friend_memberID, friend_group, friend_level From friend Where memberID = ?";
+			"SELECT friend_id, member_id, friend_member_id, friend_group, friend_level From friend Where member_id = ?";
+	
+	public final static String SQL_INSERT_USER = 
+			"INSERT INTO user (msg_id, from_id, to_id, content, is_send, date_time) VALUES (?, ?, ?, ?, ?, ?)";
 	
 	public final static String SQL_INSERT_MESSAGE = 
 			"INSERT INTO message (msg_id, from_id, to_id, content, is_send, date_time) VALUES (?, ?, ?, ?, ?, ?)";

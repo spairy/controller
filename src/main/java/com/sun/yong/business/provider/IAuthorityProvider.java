@@ -9,6 +9,8 @@ public interface IAuthorityProvider {
 
 	LoginResponse login(final LoginRequest loginRequest, final LogFlag logFlag);
 
+	LoginResponse enroll(final LoginRequest loginRequest, final LogFlag logFlag);
+	
 	UserResponse getUser(final String memberId, final LogFlag logFlag);
 	
 }

@@ -39,6 +39,27 @@ public class AuthorityServiceImpl implements IAuthorityService {
 		}
 		return loginResponse;
 	}
+	
+	@Override
+	public LoginResponse enroll(final LoginRequest loginRequest, final LogFlag logFlag) {
+		LoginResponse loginResponse = null; 
+		if (StringUtils.isEmpty(loginRequest.getUsername())) {
+			if (null == loginResponse) {
+				loginResponse = new LoginResponse();
+			}
+			loginResponse.addError(new ErrorInfo("empty","username"));
+		}
+		if (StringUtils.isEmpty(loginRequest.getPassword())) {
+			if (null == loginResponse) {
+				loginResponse = new LoginResponse();
+			}
+			loginResponse.addError(new ErrorInfo("empty","password"));
+		}
+		if (loginResponse == null || CollectionUtils.isEmpty(loginResponse.getErrors())) {
+			loginResponse = authorityProvider.enroll(loginRequest, logFlag);
+		}
+		return loginResponse;
+	}
 
 	@Override
 	public UserResponse getUser(String memberId, LogFlag logFlag) {

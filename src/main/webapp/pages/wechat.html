@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> -->
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="bootstrap/dist/img/favicon.ico">
+    
+    <title>Sprairy</title>
+    
+    <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/main.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
+</head>
+<body>
+<div class="panel">
+
+    <!--BEGIN header-->
+    <div class="header">
+        <div class="avatar">
+            <img ng-click="showProfile($event)" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=1904031726&amp;username=@9c326f28bc8e6eb54706879b4326b5c1f684ba3bee2082396676181a3cb4ba5b&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=1904031726&amp;username=@9c326f28bc8e6eb54706879b4326b5c1f684ba3bee2082396676181a3cb4ba5b&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+        </div>
+        <div class="info">
+            <h3 class="nickname">
+                <span class="display_name ng-binding" ng-bind-html="account.NickName">无意</span>
+                <a ng-click="toggleSystemMenu()" ng-show="account.HeadImgUrl" href="javascript:;" class="opt"><i class="web_wechat_add"></i></a>
+            </h3>
+            <!--<p class="signature" ng-bind-html="account.Signature" title="{{account.Signature|emojiHideFilter}}"></p>-->
+        </div>
+    </div>
+    <!--END header-->
+
+    <!--BEGIN search-->
+    <div id="search_bar" class="search_bar">
+        <i class="web_wechat_search"></i>
+        <input type="text" placeholder="搜索" ng-blur="focus = false;" ng-keydown="searchKeydown($event)" ng-input="search($event)" ng-model="keyword" class="frm_search ng-isolate-scope ng-pristine ng-valid" track-opt="{'target':'顶部搜索'}" track-type="['focus']" mm-action-track="">
+    </div>
+    <!--END search-->
+
+    <!--BEGIN tab-->
+    <div ng-class="{no_reader: !isShowReader}" class="tab">
+        <div class="tab_item">
+            <a title="聊天" ng-dblclick="dblclickChat()" ui-sref="chat" class="chat" href="#"><i ng-class="{web_wechat_tab_chat_hl: $state.includes('chat')}" class="web_wechat_tab_chat web_wechat_tab_chat_hl"></i></a>
+        </div>
+        <!-- ngIf: isShowReader --><div ng-if="isShowReader" class="tab_item ng-scope">
+            <a title="阅读" ui-sref="read" class="chat" href="#"><i ng-class="{web_wechat_tab_public_hl: $state.includes('read')}" class="web_wechat_tab_public"></i></a>
+        </div><!-- end ngIf: isShowReader -->
+        <div class="tab_item no_extra">
+            <a title="通讯录" ui-sref="contact" class="chat" href="#"><i ng-class="{web_wechat_tab_friends_hl: $state.includes('contact')}" class="web_wechat_tab_friends"></i></a>
+        </div>
+    </div>
+    <!--END tab-->
+
+    <!--BEGIN nav view-->
+    <!-- uiView: navView --><div id="navView" ui-view="navView" class="ng-scope"></div>
+
+    <div nav-chat-directive="" ng-style="{visibility:$state.current.name ==='chat'?'visible':'hidden',width:$state.current.name ==='chat'?'auto':'0'}" class="nav_view ng-scope" style="visibility: visible; width: auto;"><!--BEGIN chat list-->
+<div class="scroll-wrapper chat_list scrollbar-dynamic" style="position: relative;"><div id="J_NavChatScrollBody" class="chat_list scrollbar-dynamic scroll-content scroll-scrolly_visible" jquery-scrollbar="" style="margin-bottom: -17px; margin-right: -17px; height: 621px;">
+    <p ng-hide="chatList.length &gt; 0" class="ico_loading ng-hide"><img alt="" src="https://res.wx.qq.com/zh_CN/htmledition/v2/images/icon/ico_loading28a2f7.gif">正在获取最近的聊天...</p>
+
+    <div data-buffer-height="200" data-height="64" mm-repeat="chatContact in chatList track by chatContact.UserName" data-no-cache="true" class="ng-scope"><div class="top-placeholder ng-scope" ng-style="{height:topHeight}" style="height: 0px;"></div><!-- ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;filehelper&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645264621&amp;username=filehelper&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645264621&amp;username=filehelper&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">文件传输助手</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@01c864938b115b6981c59adeb91157b15bfcf5fe58d9367b0db581f371fcaa92&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope active">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind web_wechat_no-remind_hl"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=648526882&amp;username=@@01c864938b115b6981c59adeb91157b15bfcf5fe58d9367b0db581f371fcaa92&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=648526882&amp;username=@@01c864938b115b6981c59adeb91157b15bfcf5fe58d9367b0db581f371fcaa92&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">Digital CoE</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@a7f9ef6622624e45a89be2ff83c0360187da3c46fb9e30b82891cbac4ea7d081&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=639721465&amp;username=@@a7f9ef6622624e45a89be2ff83c0360187da3c46fb9e30b82891cbac4ea7d081&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=639721465&amp;username=@@a7f9ef6622624e45a89be2ff83c0360187da3c46fb9e30b82891cbac4ea7d081&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">Accenture CPA SH</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@21e7502abb1deb239a44606c9c02e37501d462ba4f46b457b58fb151e14856de&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=626737469&amp;username=@21e7502abb1deb239a44606c9c02e37501d462ba4f46b457b58fb151e14856de&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=626737469&amp;username=@21e7502abb1deb239a44606c9c02e37501d462ba4f46b457b58fb151e14856de&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">姬常文</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@fdd9af4a9a8019ad2a7549289d90b41743d5ea8bfdd0710d7d6fb8025ae79ee1&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626752104&amp;username=@@fdd9af4a9a8019ad2a7549289d90b41743d5ea8bfdd0710d7d6fb8025ae79ee1&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626752104&amp;username=@@fdd9af4a9a8019ad2a7549289d90b41743d5ea8bfdd0710d7d6fb8025ae79ee1&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">四侠客</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@8b9ff266b641ca36a90e0df198b0284927d80f6c0ee6b384e9667a726acc7280&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=648524474&amp;username=@@8b9ff266b641ca36a90e0df198b0284927d80f6c0ee6b384e9667a726acc7280&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=648524474&amp;username=@@8b9ff266b641ca36a90e0df198b0284927d80f6c0ee6b384e9667a726acc7280&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">埃森哲-爱瑜伽</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@825e0890abb3730edcd973a2163578a0eee675c66bfaadb1bf57e74ce76ba43d&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626737509&amp;username=@@825e0890abb3730edcd973a2163578a0eee675c66bfaadb1bf57e74ce76ba43d&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626737509&amp;username=@@825e0890abb3730edcd973a2163578a0eee675c66bfaadb1bf57e74ce76ba43d&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">09130220xx</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@0d4c544538f3377a5b10a51e1b6d24cb114b678c2b222c7c60107ac78565e1a3&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639727091&amp;username=@0d4c544538f3377a5b10a51e1b6d24cb114b678c2b222c7c60107ac78565e1a3&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639727091&amp;username=@0d4c544538f3377a5b10a51e1b6d24cb114b678c2b222c7c60107ac78565e1a3&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">梅心梅肺</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@b307f44b4786b1a2c57072de9f43ae10d5b983051870c8828447d4ffeecad04e&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648526508&amp;username=@b307f44b4786b1a2c57072de9f43ae10d5b983051870c8828447d4ffeecad04e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648526508&amp;username=@b307f44b4786b1a2c57072de9f43ae10d5b983051870c8828447d4ffeecad04e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">Echo</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@babeff05d7ca9f032cb8a4ea9fa1d12f8bfa7e51e98ff31b45be3ed6bd334c0b&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648522243&amp;username=@babeff05d7ca9f032cb8a4ea9fa1d12f8bfa7e51e98ff31b45be3ed6bd334c0b&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648522243&amp;username=@babeff05d7ca9f032cb8a4ea9fa1d12f8bfa7e51e98ff31b45be3ed6bd334c0b&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">啦啦啦</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@ac2492f28d723871261436004c3b626b2828c3793697b2e91c8596ecd4a18e7b&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=636940725&amp;username=@@ac2492f28d723871261436004c3b626b2828c3793697b2e91c8596ecd4a18e7b&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=636940725&amp;username=@@ac2492f28d723871261436004c3b626b2828c3793697b2e91c8596ecd4a18e7b&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">育红班筒子们</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@f0f6eda2e7b4a1af629522a82540a2b6&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=475140&amp;username=@f0f6eda2e7b4a1af629522a82540a2b6&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=475140&amp;username=@f0f6eda2e7b4a1af629522a82540a2b6&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">王莉</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@5e5fc7470ea8d2d48f7d489a75d2bd7e&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645262970&amp;username=@5e5fc7470ea8d2d48f7d489a75d2bd7e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645262970&amp;username=@5e5fc7470ea8d2d48f7d489a75d2bd7e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">孙杰</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div ng-repeat="chatContact in chatList track by chatContact.UserName" class="ng-scope">
+        <!-- ngIf: !chatContact.isShieldUser() --><div data-cm="{&quot;type&quot;:&quot;chat&quot;,&quot;username&quot;:&quot;@@9d1e157b9ac6378d5fbd2cf8a3b253b643fb5c5d3359e18d0c2a9432d5ac1423&quot;}" ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}" ng-click="itemClick(chatContact.UserName)" ng-if="!chatContact.isShieldUser()" class="chat_item slide-left ng-scope">
+
+            <div class="ext">
+                <p class="attr ng-binding"></p>
+                <!-- ngIf: chatContact.isMuted() --><p ng-class="{'no_time': !chatContact.MMDigestTime}" class="attr ng-scope no_time" ng-if="chatContact.isMuted()">
+                    <i ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}" class="web_wechat_no-remind"></i>
+                </p><!-- end ngIf: chatContact.isMuted() -->
+            </div>
+
+            <div class="avatar">
+                <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=636351671&amp;username=@@9d1e157b9ac6378d5fbd2cf8a3b253b643fb5c5d3359e18d0c2a9432d5ac1423&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=636351671&amp;username=@@9d1e157b9ac6378d5fbd2cf8a3b253b643fb5c5d3359e18d0c2a9432d5ac1423&amp;skey=" class="img">
+
+                <!-- ngIf: chatContact.NoticeCount && chatContact.isMuted() -->
+
+                <!-- ngIf: chatContact.NoticeCount && !chatContact.isMuted() -->
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span ng-bind-html="chatContact.getDisplayName()" class="nickname_text ng-binding">列王的纷争～CQ5</span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <!-- ngIf: chatContact.MMDigest -->
+            </div>
+        </div><!-- end ngIf: !chatContact.isShieldUser() -->
+    </div><!-- end ngRepeat: chatContact in chatList track by chatContact.UserName --><div class="bottom-placeholder ng-scope" ng-style="{height:bottomHeight}" style="height: 2112px;"></div></div>
+</div><div class="scroll-element scroll-x scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="width: 89px; left: 0px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div><div class="scroll-element scroll-y scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="height: 120px; top: 11.381px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div></div>
+<!--END chat list--></div>
+    <div nav-contact-directive="" ng-style="{visibility:$state.current.name ==='contact'?'visible':'hidden',width:$state.current.name ==='contact'?'auto':'0'}" class="nav_view ng-scope" style="visibility: hidden; width: 0px;"><!--BEGIN contact list-->
+<div class="scroll-wrapper J_ContactScrollBody scrollbar-dynamic contact_list ng-isolate-scope" style="position: relative;"><div class="J_ContactScrollBody scrollbar-dynamic contact_list ng-isolate-scope scroll-content scroll-scrollx_visible scroll-scrolly_visible" jquery-scrollbar="" data-dblclick-callback="dblclick" data-click-user-callback="showProfile" data-friend-contacts="friendContacts" data-chatroom-contacts="chatroomContacts" data-star-contacts="starContacts" data-current-contact="currentContact" data-all-contacts="allContacts" contact-list-directive="" id="navContact" style="margin-bottom: -17px; margin-right: -17px; height: 621px;">
+    <!--BEGIN star contact list-->
+    <div data-buffer-height="100" data-height-calc="heightCalc" mm-repeat="item in allContacts" data-no-cache="true" class="ng-scope"><div class="top-placeholder ng-scope" ng-style="{height:topHeight}" style="height: 0px;"></div><!-- ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" --><h4 class="contact_title ng-binding ng-scope" ng-if="item.type==&quot;header&quot;">群组</h4><!-- end ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626737509&amp;username=@@825e0890abb3730edcd973a2163578a0eee675c66bfaadb1bf57e74ce76ba43d&amp;skey=" src="/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=626737509&amp;username=@@825e0890abb3730edcd973a2163578a0eee675c66bfaadb1bf57e74ce76ba43d&amp;skey=" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">09130220xx</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" --><h4 class="contact_title ng-binding ng-scope" ng-if="item.type==&quot;header&quot;">A</h4><!-- end ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636940509&amp;username=@df37fe3ea480f201a0ead1641675d6245688f5d01d2d0fefb5fe94e71d10c47e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636940509&amp;username=@df37fe3ea480f201a0ead1641675d6245688f5d01d2d0fefb5fe94e71d10c47e&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">Amy</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636933933&amp;username=@d536a912bd8e11a8f28262b70cbbe83cb805a13ead9a76d9b2b54cee9cde81f2&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636933933&amp;username=@d536a912bd8e11a8f28262b70cbbe83cb805a13ead9a76d9b2b54cee9cde81f2&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">阿湘</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648525822&amp;username=@b7a71b2889f758cfb2b195ec52b2e14a&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648525822&amp;username=@b7a71b2889f758cfb2b195ec52b2e14a&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">A小筠筠</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" --><h4 class="contact_title ng-binding ng-scope" ng-if="item.type==&quot;header&quot;">B</h4><!-- end ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639728323&amp;username=@d576f44b5da297d3b34ca34ea56d961e22ee2880162607b349f59c3873d81eb9&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639728323&amp;username=@d576f44b5da297d3b34ca34ea56d961e22ee2880162607b349f59c3873d81eb9&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">爸爸</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=633305771&amp;username=@776e45040259854823f1795b9de52ba6d94669cb47fcba3cf947b38fa64380b5&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=633305771&amp;username=@776e45040259854823f1795b9de52ba6d94669cb47fcba3cf947b38fa64380b5&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">白小茉</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648522036&amp;username=@d275e7f4e6bbfa77af32e3d0c5d499bc&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=648522036&amp;username=@d275e7f4e6bbfa77af32e3d0c5d499bc&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">Bena</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639727046&amp;username=@1930a324885429aa40dd4844936c9bee&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639727046&amp;username=@1930a324885429aa40dd4844936c9bee&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">布先生</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" --><h4 class="contact_title ng-binding ng-scope" ng-if="item.type==&quot;header&quot;">C</h4><!-- end ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636929200&amp;username=@02058f9b104e6c81c46115fc9d1a5095ae0eb94a37862d2759dbe1e7ad26c349&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636929200&amp;username=@02058f9b104e6c81c46115fc9d1a5095ae0eb94a37862d2759dbe1e7ad26c349&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">常俊荣</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639724289&amp;username=@d8b74c7bf5dd62441bf9c469aba4a2fc&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=639724289&amp;username=@d8b74c7bf5dd62441bf9c469aba4a2fc&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">常玉芳</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636927586&amp;username=@f5242f0f75a4de911f0fabe570e9f8522231083a1d50274ea10e5eb05856d8ab&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636927586&amp;username=@f5242f0f75a4de911f0fabe570e9f8522231083a1d50274ea10e5eb05856d8ab&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">晨晨</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636942087&amp;username=@a3ed1548e9cc411a3e3e6632d68bb61c&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=636942087&amp;username=@a3ed1548e9cc411a3e3e6632d68bb61c&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">陈都</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div ng-repeat="item in allContacts" class="ng-scope">
+        <!-- ngIf: item.type=="header" -->
+        <!-- ngIf: item.type!="header" --><div ng-class="{'active':currentContact.UserName == item.UserName}" ng-dblclick="dblclickCallback(item)" data-click-user-callback="clickUserCallback" data-user="item" contact-item-directive="" ng-if="item.type!=&quot;header&quot;" class="ng-isolate-scope">
+    <!-- ngIf: showOrderSymbol&&user.MMC -->
+    <div ng-click="clickUserCallback &amp;&amp; clickUserCallback(user)" class="contact_item ">
+        <div class="avatar">
+            <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645260739&amp;username=@21aef215662c103622dddb94da6f828a62096d5af0ebc9b3724df98f1f7a5580&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=645260739&amp;username=@21aef215662c103622dddb94da6f828a62096d5af0ebc9b3724df98f1f7a5580&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img lazy">
+        </div>
+        <div class="info">
+            <h4 ng-bind-html="user.getDisplayName()" class="nickname ng-binding">陈杰</h4>
+        </div>
+    </div>
+</div><!-- end ngIf: item.type!="header" -->
+    </div><!-- end ngRepeat: item in allContacts --><div class="bottom-placeholder ng-scope" ng-style="{height:bottomHeight}" style="height: 5432px;"></div></div>
+</div><div class="scroll-element scroll-x scroll-scrollx_visible scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="width: 0px; left: 0px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div><div class="scroll-element scroll-y scroll-scrollx_visible scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="height: 57px; top: 0px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div></div>
+<!--END contact list--></div>
+    <div nav-read-directive="" ng-style="{visibility:$state.current.name ==='read'?'visible':'hidden',width:$state.current.name ==='read'?'auto':'0'}" class="nav_view ng-scope" style="visibility: hidden; width: 0px;"><!--BEGIN chat list-->
+<div class="scroll-wrapper read_list scrollbar-dynamic" style="position: relative;"><div id="J_NavReadScrollBody" class="read_list scrollbar-dynamic scroll-content scroll-scrollx_visible scroll-scrolly_visible" jquery-scrollbar="" style="margin-bottom: -17px; margin-right: -17px; height: 621px;">
+
+    <p ng-show="subscribeMsgs.defaultValue" class="ico_loading ng-hide"><img alt="" src="https://res.wx.qq.com/zh_CN/htmledition/v2/images/icon/ico_loading28a2f7.gif">加载中...</p>
+    <p ng-show="!subscribeMsgs.defaultValue &amp;&amp; subscribeMsgs.length == 0" class="ico_loading ng-hide">暂无文章...</p>
+    <div mm-repeat-keyboard-scroll-selector="#J_NavReadScrollBody" mm-repeat-keyboard="" data-buffer-height="200" data-height-calc="heightCalc" mm-repeat="readItem in articleList" data-no-cache="true" class="ng-scope"><div class="top-placeholder ng-scope" ng-style="{height:topHeight}" style="height: 0px;"></div><!-- ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName --><div ng-class="{first: readItem._index === 0}" ng-if="readItem.UserName" class="just_for_bg ng-scope first">
+            <div class="read_item_hd">
+                <p class="date ng-binding">周四</p>
+                <div class="avatar">
+                    <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@d8857d84f29730c59cbe76f5fe1c5e22&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@d8857d84f29730c59cbe76f5fe1c5e22&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+                </div>
+                <p class="info">
+                    <span class="username ng-binding">Java编程</span>
+                </p>
+            </div>
+        </div><!-- end ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope active" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">大型网站系统架构的演化</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/YOkhPCLwLC9Tic1xvVIzBQB643ukrgzPQutIp4HAliaefuxPSZcTQz32DYdcu4Zq0Dke1ibZV3aHe2eAbMvlSHIbQ/640?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName --><div ng-class="{first: readItem._index === 0}" ng-if="readItem.UserName" class="just_for_bg ng-scope">
+            <div class="read_item_hd">
+                <p class="date ng-binding">周四</p>
+                <div class="avatar">
+                    <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@63c7c1b1e25d4f8297b9930386484faf&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@63c7c1b1e25d4f8297b9930386484faf&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+                </div>
+                <p class="info">
+                    <span class="username ng-binding">黑客技术与网络安全</span>
+                </p>
+            </div>
+        </div><!-- end ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">黑客兜售1.67亿LinkedIn用户账户数据，要价5比特币</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/mbeDyxcszeGkB8VctrLbiafns6JDRPXl67ibGicyAMicRFDfsbE5uOkaDrURNfykNrjqRC5uF8BN6Qo2fAjeBXVc5w/640?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName --><div ng-class="{first: readItem._index === 0}" ng-if="readItem.UserName" class="just_for_bg ng-scope">
+            <div class="read_item_hd">
+                <p class="date ng-binding">周四</p>
+                <div class="avatar">
+                    <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@328192a64a4af8bcbc46334e00cbfa69&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@328192a64a4af8bcbc46334e00cbfa69&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+                </div>
+                <p class="info">
+                    <span class="username ng-binding">晚安少年</span>
+                </p>
+            </div>
+        </div><!-- end ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">看你朋友圈，觉得追你好贵</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/3qLLOnGUwtdsZQibjE4732hWK46ze8KpjKuaWwTXdhpU7UZQyOnnjG9T75LYrDDcml6uCbcqGKIcvun444jDZFQ/640?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">贱人，都是被好人惯出来的</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/3qLLOnGUwtdsZQibjE4732hWK46ze8Kpj5aJoLX6eozhSJHiaeOWatqCPFibic6DwmZan9icRMScuOdShhUaQfPHaYw/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">精致，是一个姑娘最高的修养</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/3qLLOnGUwtcRWH7ia1NfmsJMAhrzIOp0EvAEfp6ViapaKiaOo6JGiacQCYmXX1sm8VIUcvROKXxhDtGIMZjSCTbpDg/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">VOL.343 爱情里最棒的心态</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/3qLLOnGUwtdsZQibjE4732hWK46ze8KpjRe2cNS7fYEIfQGtzLI9e05bhscWAzvLUReibCJWGNAmW5iaT32eclOaA/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">女生能轻易看穿男生的哪些谎言？</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/3qLLOnGUwtdsZQibjE4732hWK46ze8Kpj5m2wBBmflVxFVgnvam5Waj3dXVT6e4zAjhBfK4sKUcOs2U5icxvz1VA/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName --><div ng-class="{first: readItem._index === 0}" ng-if="readItem.UserName" class="just_for_bg ng-scope">
+            <div class="read_item_hd">
+                <p class="date ng-binding">周四</p>
+                <div class="avatar">
+                    <img alt="" mm-src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@6e318588dc247ae2ca82639210c4258c&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" src="/cgi-bin/mmwebwx-bin/webwxgeticon?seq=0&amp;username=@6e318588dc247ae2ca82639210c4258c&amp;skey=@crypt_97d05fff_7e286a54ee0c9c6eb0d3c52c495166d7" class="img">
+                </div>
+                <p class="info">
+                    <span class="username ng-binding">招商银行信用卡北京</span>
+                </p>
+            </div>
+        </div><!-- end ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">这个六月送你萌萌的HELLO KITTY保温壶套装</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/VAUgDa366vYe2vPO0p4q5VMUflSVM5JgP9icgnABpL8mcmwrJuflQLCjn33aPlJHpbw865fQSOPCLDicTicBoy1ew/640?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">【Audi•华阳】微电影招募：下一秒你可以创造自己的未来</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/VAUgDa366vYe2vPO0p4q5VMUflSVM5JglMFUptVcpp3dhqlJyV2uP00U4QzgCamSib6VF9ZGicc2fec2HcktWpEw/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div ng-repeat="readItem in articleList" class="ng-scope">
+        <!-- ngIf: readItem.UserName -->
+        <!-- ngIf: !readItem.UserName --><div ng-class="{'active': (readItem == currentItem)}" ng-click="itemClick(readItem)" class="read_item slide-left ng-scope" ng-if="!readItem.UserName">
+            <div class="cont">
+                <h3 class="title ng-binding">免费领取愤怒的小鸟衍生品</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div ng-style="{'background-image': 'url('+ readItem.Cover +')'}" class="img" style="background-image: url(&quot;http://mmbiz.qpic.cn/mmbiz/VAUgDa366vYe2vPO0p4q5VMUflSVM5JgfAdZ101ZOGh5HJfpt1N76cxhZlQQeO81gG3EsQDzf5TOSYciculqO6w/300?wxtype=jpeg&amp;wxfrom=0|0|0&quot;);"></div>
+                </div>
+            </div>
+        </div><!-- end ngIf: !readItem.UserName -->
+    </div><!-- end ngRepeat: readItem in articleList --><div class="bottom-placeholder ng-scope" ng-style="{height:bottomHeight}" style="height: 1650px;"></div></div>
+</div><div class="scroll-element scroll-x scroll-scrollx_visible scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="width: 0px; left: 0px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div><div class="scroll-element scroll-y scroll-scrollx_visible scroll-scrolly_visible"><div class="scroll-element_corner"></div><div class="scroll-arrow scroll-arrow_less"></div><div class="scroll-arrow scroll-arrow_more"></div><div class="scroll-element_outer">    <div class="scroll-element_size"></div>    <div class="scroll-element_inner-wrapper">        <div class="scroll-element_inner scroll-element_track">            <div class="scroll-element_inner-bottom"></div>        </div>    </div>    <div class="scroll-bar" style="height: 125px; top: 0px;">        <div class="scroll-bar_body">            <div class="scroll-bar_body-inner"></div>        </div>        <div class="scroll-bar_bottom"></div>        <div class="scroll-bar_center"></div>    </div></div></div></div>
+<!--END chat list--></div>
+
+    <!--</div>-->
+    <!--END nav view-->
+</div>
+</body>

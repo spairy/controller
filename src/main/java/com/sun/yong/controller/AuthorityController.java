@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sun.yong.business.IAuthorityService;
+import com.sun.yong.common.entity.common.ErrorInfo;
 import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.common.UserSession;
 import com.sun.yong.common.entity.request.LoginRequest;
@@ -48,6 +49,33 @@ public class AuthorityController extends BaseController {
 		loginResponse = authorityService.login(loginRequest, logIndex);
 		UserSession userSession = createUserSession(loginResponse);
 		SessionUtils.setUserSession(request, response, userSession);
+		return loginResponse;
+	}
+	
+	@RequestMapping(value = "/enroll", method = RequestMethod.POST)
+	@ResponseBody
+	public LoginResponse enroll(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody LoginRequest loginRequest) {
+		System.out.print("enroll ");
+		LoginResponse loginResponse = null;
+		LogFlag logIndex = LogUtils.getLogFlag();
+		loginResponse = authorityService.enroll(loginRequest, logIndex);
+		UserSession userSession = createUserSession(loginResponse);
+		SessionUtils.setUserSession(request, response, userSession);
+		return loginResponse;
+	}
+	
+	@RequestMapping(value = "/getSession", method = RequestMethod.GET)
+	@ResponseBody
+	public LoginResponse getSession(HttpServletRequest request, HttpServletResponse response) {
+		System.out.print("getSession");
+		LoginResponse loginResponse = new LoginResponse();
+		UserSession userSession = SessionUtils.getUserSession(request, response);
+		if (null == userSession) {
+			loginResponse.addError(new ErrorInfo("Session empty"));
+		} else {
+			loginResponse.setUsername(userSession.getUsername());
+		}
 		return loginResponse;
 	}
 	

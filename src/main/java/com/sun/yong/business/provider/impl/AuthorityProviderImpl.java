@@ -43,6 +43,32 @@ public class AuthorityProviderImpl implements IAuthorityProvider {
 		}
 		return loginResponse;
 	}
+	
+	@Override
+	public LoginResponse enroll(LoginRequest loginRequest, LogFlag logFlag) {
+		LoginResponse loginResponse = new LoginResponse();
+		try {
+			UserInfo userInfo = dataService.getUserInfoByUserName(loginRequest.getUsername());
+			if (userInfo == null || !userInfo.getUsername().equals(loginRequest.getUsername())) {
+				loginResponse.addError(new ErrorInfo("fail", "username"));
+			} else if (!loginRequest.getPassword().equals(userInfo.getPassword())) {
+				loginResponse.addError(new ErrorInfo("fail", "password"));
+			} else {
+				loginResponse.setMemberID(userInfo.getMemberID());
+				loginResponse.setUsername(userInfo.getUsername());
+				loginResponse.setSurname(userInfo.getSurname());
+				loginResponse.setName(userInfo.getName());
+				loginResponse.setBirthYear(userInfo.getBirthYear());
+				loginResponse.setBirthMonth(userInfo.getBirthMonth());
+				loginResponse.setBirthDay(userInfo.getBirthDay());
+				loginResponse.setIdentity(null == userInfo.getIdentity() ? "" : userInfo.getIdentity().getValue());
+			}
+		} catch (Exception e) {
+			loginResponse.addError(new ErrorInfo("system error","provider"));
+			System.out.println(e.getMessage());
+		}
+		return loginResponse;
+	}
 
 	@Override
 	public UserResponse getUser(String memberId, LogFlag logFlag) {

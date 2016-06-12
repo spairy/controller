@@ -23,12 +23,11 @@
 <body>
     <div>
     	<div class="container">
-			<select id="friends">
-<!-- 				<option value ="volvo">Volvo</option>
-			  <option value ="saab">Saab</option>
-			  <option value="opel">Opel</option>
-			  <option value="audi">Audi</option> -->
-			</select>
+	    	<div id="friend">
+				<!-- <input id="friend1" type='checkbox' name='VoteOption1' value="" />
+				<input id="friend2" type='checkbox' name='VoteOption1' value="" />
+				<input id="friend3" type='checkbox' name='VoteOption1' value="" /> -->
+			</div>
 		</div>
 		<div class="container">
 			<input type="text" id="text" class="form-control" placeholder="Please input message here">
@@ -68,6 +67,7 @@
 	
 	function init() {
 		output = document.getElementById("message");
+		friend = document.getElementById("friend");
 		initWebSocket();
 	}
 	
@@ -117,15 +117,35 @@
 	}
 	function onMessage(evt) {
 		//called on receipt of message
-		alert("evt " + evt);
-		alert("evt.data " + evt.data);
-		if (null != evt.data.friend && undefined != evt.data.friend && "" != evt.data.friend) {
-			
+		var content = eval("(" + evt.data + ")").content;//$.parseJSON(evt.data);
+		var userRes = eval("(" + content + ")");
+		var onefriend = userRes.friend;
+		if (null != onefriend && undefined != onefriend && "" != onefriend) {
+			var input = document.createElement("input");
+			input.type="checkbox";
+			input.value=onefriend.memberID;
+			input.name="friend";
+			input.innerHTML = onefriend.memberID;
+			friend.appendChild(input);
+			var span = document.createElement("span");
+			span.innerHTML = onefriend.memberID;
+			friend.appendChild(span);
+			var input1 = document.createElement("input");
+			input1.type="checkbox";
+			input1.value=onefriend.memberID;
+			input1.name="friend";
+			input1.innerHTML = onefriend.memberID;
+			friend.appendChild(input1);
+			var span1 = document.createElement("span");
+			span1.innerHTML = onefriend.memberID;
+			friend.appendChild(span1);
+			//$('#friend1').val(evtRes.friend[0].content.memberId)
+			//$('#friend2').val(evtRes.friend[1].content.memberId)
+		} else {
+			var message = JSON.parse(evt.data);
+			writeToScreen(message)
 		}
-		var message = JSON.parse(evt.data);
-		alert("message " + message);
-		
-		writeToScreen(message);
+;
 	}
 	function onError(evt) {
 		//called on error

@@ -15,6 +15,8 @@ public interface IDataServiceSpringJDBC {
 	
 	UserInfo getUser(String memberId) throws DateServiceException;
 	
+	void insertUser(UserInfo userInfo) throws DateServiceException;
+	
 	void insertMessage(Message message) throws DateServiceException;
 	
 	void isSendMessage(Message message) throws DateServiceException;
