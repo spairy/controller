@@ -106,12 +106,16 @@
 	}
 	
 	function onOpen(evt) {
+		alert("on open");
+		alert(evt);
 		//called as soon as a connection is opened
 		if(websocket.readyState == WebSocket.OPEN){
 			console.log("Connect to server");
 		}
 	}
 	function onClose(evt) {
+		alert("on close");
+		alert(evt);
 		//called when connection is closed
 		writeToScreen("DISCONNECTED");
 	}
@@ -148,6 +152,8 @@
 ;
 	}
 	function onError(evt) {
+		alert("on error");
+		alert(evt);
 		//called on error
 		writeToScreen("ERROR:" + evt.data);
 	}
