@@ -47,7 +47,6 @@ function init() {
                 $("#sign-in-div").show();
                 $("#sign-in-span").html(data.username);
             } else {
-                $("#sign-in-div").show();
                 $("#sign-in-span").html("login error");
             }
         },

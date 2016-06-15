@@ -19,6 +19,17 @@ public class SessionUtils {
         }
     }
     
+    public static void removeUserSession(final HttpServletRequest request) {
+    	System.out.print("remove user session");
+        final HttpSession session = request.getSession();
+        if (null != session) {
+	        synchronized (session) {
+	            session.removeAttribute(Constant.USER_SESSION_KEY);
+	            session.removeAttribute(Constant.USER_SESSION_TIME_KEY);
+	        }
+        }
+    }
+    
     public static UserSession getUserSession(final HttpServletRequest request, final HttpServletResponse response) {
     	System.out.print("get user session");
     	UserSession userSession = null;

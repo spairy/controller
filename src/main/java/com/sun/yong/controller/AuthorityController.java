@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sun.yong.business.IAuthorityService;
+import com.sun.yong.common.entity.common.BaseResponse;
+import com.sun.yong.common.entity.common.ErrorEnum;
 import com.sun.yong.common.entity.common.ErrorInfo;
 import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.common.UserSession;
@@ -52,6 +54,22 @@ public class AuthorityController extends BaseController {
 		return loginResponse;
 	}
 	
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResponse logout(HttpServletRequest request, HttpServletResponse response) {
+		System.out.print("logout");
+		BaseResponse baseResponse = null;
+		try {
+			//LogFlag logIndex = LogUtils.getLogFlag();
+			SessionUtils.removeUserSession(request);
+			baseResponse = new BaseResponse();
+		} catch (Exception e) {
+			baseResponse = new BaseResponse();
+			baseResponse.addError(new ErrorInfo(ErrorEnum.ERR_SYS_001.toString()));
+		}
+		return baseResponse;
+	}
+	
 	@RequestMapping(value = "/enroll", method = RequestMethod.POST)
 	@ResponseBody
 	public LoginResponse enroll(HttpServletRequest request, HttpServletResponse response,
@@ -72,7 +90,7 @@ public class AuthorityController extends BaseController {
 		LoginResponse loginResponse = new LoginResponse();
 		UserSession userSession = SessionUtils.getUserSession(request, response);
 		if (null == userSession) {
-			loginResponse.addError(new ErrorInfo("Session empty"));
+			loginResponse.addError(new ErrorInfo(ErrorEnum.ERR_SYS_002.toString()));
 		} else {
 			loginResponse.setUsername(userSession.getUsername());
 		}

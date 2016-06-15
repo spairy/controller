@@ -67,11 +67,11 @@ public class ChatJDKSocket {
 	 *
 	 * @param session
 	 * @param config
-	 * @throws IOException
+	 * @throws Exception 
 	 */
 	@SuppressWarnings("resource")
 	@OnOpen
-	public void onOpen(Session session, EndpointConfig config) throws IOException {
+	public void onOpen(Session session, EndpointConfig config) throws Exception {
 		logFlag = LogUtils.getLogFlag();;
 		this.session = session;
 		this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
@@ -160,11 +160,11 @@ public class ChatJDKSocket {
 		}
 		subOnlineCount();
 		MessageEventRequest messageEventRequest = new MessageEventRequest();
-		messageEventRequest.setFromMemberID("10000001");
+		/*messageEventRequest.setFromMemberID("10000001");
 		messageEventRequest.setToMemberID(userSession.getMemberID());
 		messageEventRequest.setContent("On Close!");
 		messageEventRequest.setSend(Boolean.FALSE);
-		broadcastMessage(messageEventRequest);
+		broadcastMessage(messageEventRequest);*/
 	}
 
 	@OnError

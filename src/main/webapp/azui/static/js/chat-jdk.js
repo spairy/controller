@@ -18,7 +18,7 @@ function chatJDKInit() {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(data) {
-            if (isNot(data.errors)) {
+            if (isEmpty(data.errors)) {
             	//$('.am-hide').addClass("am-block");
             	//$('.am-hide').removeClass("am-hide");
                 initWebSocket();
@@ -37,10 +37,12 @@ function chatJDKInit() {
 
 
 function initWebSocket() {
+	var wsUri = 'ws://localhost:8080/controller/chatJDK';
 	window.WebSocket = window.WebSocket || window.MozWebSocket;
 	if (window.WebSocket) {
 		websocket = new WebSocket(wsUri);
-		writeToScreen("You have connectted to server, welcome");
+		// writeToScreen("You have connectted to server, welcome");
+		alert('You have connectted to server, welcome');
 		websocket.onopen = onOpen;
 		websocket.onclose = onClose;
 		websocket.onmessage = onMessage;
@@ -72,6 +74,7 @@ function reConnect () {
 
 function onOpen(evt) {
 	//called as soon as a connection is opened
+	alert('open');
 	if(websocket.readyState == WebSocket.OPEN){
 		console.log("Connect to server");
 	}

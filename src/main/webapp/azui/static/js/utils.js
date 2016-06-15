@@ -7,7 +7,7 @@ function serializeJson(id) {
     return data;
 }
 
-function isNot(thing) {
+function isEmpty(thing) {
 	var flag = false;
 	if (null == thing) flag = true;
 	    else if (0 == thing.length) flag = true;
