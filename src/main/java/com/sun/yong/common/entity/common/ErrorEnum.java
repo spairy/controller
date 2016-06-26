@@ -4,7 +4,8 @@ public enum ErrorEnum {
 
 	ERR_SYS_000("S000", "Unknow Exception!"),
 	ERR_SYS_001("S001", "System Exception!"),
-	ERR_SYS_002("S002", "Session Is Empty!");
+	ERR_SYS_002("S002", "Session Is Empty!"),
+	ERR_SYS_003("S003", "Login By Another!");
 	
 	private String errorCode;
 	

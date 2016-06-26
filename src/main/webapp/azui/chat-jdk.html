@@ -130,10 +130,13 @@
       </ul>
 
       <div class="am-topbar-right">
-        <button class="am-btn am-btn-secondary am-topbar-btn am-btn-sm"><span class="am-icon-pencil"></span> sign up</button>
+        <button class="to-login am-btn am-btn-secondary am-topbar-btn am-btn-sm"><span class="am-icon-pencil"></span> sign up</button>
       </div>
       <div class="am-topbar-right">
-        <button class="am-btn am-btn-primary am-topbar-btn am-btn-sm"><span class="am-icon-user"></span> sign in</button>
+        <button class="to-login am-btn am-btn-primary am-topbar-btn am-btn-sm"><span class="am-icon-user"></span> sign in</button>
+      </div>
+      <div class="am-topbar-right">
+        <button class="sign-out am-btn am-btn-primary am-topbar-btn am-btn-sm"><span class="username"></span>  <span class="am-icon-user"></span> sign out</button>
       </div>
     </div>
   </div>
@@ -142,24 +145,37 @@
 <div class="detail">
   <div class="am-g am-container">
 	<div class="chat-box">
-	  <div class="friends">
-	    <label>Send Message To</label>
-	    <div class="am-radio friends-radio am-hide">
-	      <label>
-	        <input type="radio" name="doc-radio-1" value="option1">
-	        <span></span>
-	      </label>
-	    </div>
-	    <div class="no-friends am-hide">
-          <span>You do not have any friends. Click <a>here</a> to add friends.</span>
-	    </div>
-	    <label>Messages</label>
-	    <div class="message">
-          <textarea class="message-textarea" rows="5" id="doc-ta-1"></textarea>
-	    </div>
-	  </div>
+      <label class="friends-radio am-hide">Send Message To:</label>
+      <div class="am-radio friends-radio am-hide">
+        <div class="friend-opt0">
+          <input type="radio" name="friend-opt" value="">
+          <span></span>
+        </div>
+      </div>
+      <div class="no-friends am-hide">
+        <br />
+        <span>You do not have any friends. Click <a>here</a> to add friends.</span>
+      </div>
+      <label class="message am-hide">Messages:</label>
+      <div class="message am-hide">
+          <ul class="message-ul">
+            <li class="message-li am-hide">
+              <span>(</span>
+              <span class="message-datetime"></span>
+              <span>)</span>
+              <span class="message-from"></span>
+              <span> TO </span>
+              <span class="message-to"></span>
+              <span>: </span>
+              <span class="message-content"></span>
+            </li>
+          </ul>
+          <input type="text" class="content" name="content">
+          <input type="button" class="sendMessage" name="sendMessage" value="SEND">
+      </div>
 	  <br />
 	  
+	  <label class="add-friends am-hide">Add Friend:</label>
 	  <div class="add-friends am-hide">
 	    <form method="post" class="am-form add-friends-form">
 		    <label>

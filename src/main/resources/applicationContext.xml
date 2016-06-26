@@ -28,7 +28,6 @@
         <property name="authorityService" ref="authorityService" />
     </bean>
     <bean class="com.sun.yong.chendu.ChatJDKSocket" >
-        <property name="chatService" ref="chatService" />
     </bean>
     
     <bean id="authorityService" class="com.sun.yong.business.impl.AuthorityServiceImpl" >

@@ -26,7 +26,7 @@ public class ChatJDKController extends BaseController {
 	@ResponseBody
 	public CreateChatResponse createChat(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody CreateChatRequest CreateChatRequest) {
-		System.out.print("createChat post");
+		System.out.println("createChat post");
 		LogFlag logFlag = LogUtils.getLogFlag();
 		CreateChatResponse createChatResponse = null;
 		UserSession userSession = SessionUtils.getUserSession(request, response);
@@ -43,7 +43,7 @@ public class ChatJDKController extends BaseController {
 	@ResponseBody
 	public CreateChatResponse getFriends(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody CreateChatRequest CreateChatRequest) {
-		System.out.print("createChat post");
+		System.out.println("createChat post");
 		LogFlag logFlag = LogUtils.getLogFlag();
 		CreateChatResponse createChatResponse = null;
 		UserSession userSession = SessionUtils.getUserSession(request, response);

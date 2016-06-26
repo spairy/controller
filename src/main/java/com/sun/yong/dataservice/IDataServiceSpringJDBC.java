@@ -1,5 +1,7 @@
 package com.sun.yong.dataservice;
 
+import java.util.List;
+
 import com.sun.yong.common.entity.model.Friend;
 import com.sun.yong.common.entity.model.Message;
 import com.sun.yong.common.entity.model.UserInfo;
@@ -11,13 +13,13 @@ public interface IDataServiceSpringJDBC {
 	
 	UserInfo getUserInfoByMemberId(String memberId) throws DateServiceException;
 	
-	Friend getFriendByMemberId(String memberId) throws DateServiceException;
+	List<Friend> getFriendByMemberId(String memberId) throws DateServiceException;
 	
 	UserInfo getUser(String memberId) throws DateServiceException;
 	
 	void insertUser(UserInfo userInfo) throws DateServiceException;
 	
-	void insertMessage(Message message) throws DateServiceException;
+	void insertMessage(List<Message> messageList) throws DateServiceException;
 	
-	void isSendMessage(Message message) throws DateServiceException;
+	void isSendMessage(List<Message> messageList) throws DateServiceException;
 }

@@ -48,6 +48,10 @@ $(document).ready(function(){
 		    }
 		});
     });
+    
+    $('h1').click(function () {
+		window.location.href='index.html';
+    });
 });
 
 function loginInit() {

@@ -45,7 +45,7 @@ public class AuthorityController extends BaseController {
 	@ResponseBody
 	public LoginResponse login(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody LoginRequest loginRequest) {
-		System.out.print("login post");
+		System.out.println("login post");
 		LoginResponse loginResponse = null;
 		LogFlag logIndex = LogUtils.getLogFlag();
 		loginResponse = authorityService.login(loginRequest, logIndex);
@@ -57,7 +57,7 @@ public class AuthorityController extends BaseController {
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResponse logout(HttpServletRequest request, HttpServletResponse response) {
-		System.out.print("logout");
+		System.out.println("logout");
 		BaseResponse baseResponse = null;
 		try {
 			//LogFlag logIndex = LogUtils.getLogFlag();
@@ -74,7 +74,7 @@ public class AuthorityController extends BaseController {
 	@ResponseBody
 	public LoginResponse enroll(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody LoginRequest loginRequest) {
-		System.out.print("enroll ");
+		System.out.println("enroll ");
 		LoginResponse loginResponse = null;
 		LogFlag logIndex = LogUtils.getLogFlag();
 		loginResponse = authorityService.enroll(loginRequest, logIndex);
@@ -86,13 +86,20 @@ public class AuthorityController extends BaseController {
 	@RequestMapping(value = "/getSession", method = RequestMethod.GET)
 	@ResponseBody
 	public LoginResponse getSession(HttpServletRequest request, HttpServletResponse response) {
-		System.out.print("getSession");
+		System.out.println("getSession");
 		LoginResponse loginResponse = new LoginResponse();
 		UserSession userSession = SessionUtils.getUserSession(request, response);
 		if (null == userSession) {
 			loginResponse.addError(new ErrorInfo(ErrorEnum.ERR_SYS_002.toString()));
 		} else {
+			loginResponse.setMemberID(userSession.getMemberID());
 			loginResponse.setUsername(userSession.getUsername());
+			loginResponse.setSurname(userSession.getSurname());
+			loginResponse.setName(userSession.getName());
+			loginResponse.setBirthYear(userSession.getBirthYear());
+			loginResponse.setBirthMonth(userSession.getBirthMonth());
+			loginResponse.setBirthDay(userSession.getBirthDay());
+			loginResponse.setIdentity(userSession.getIdentity());
 		}
 		return loginResponse;
 	}

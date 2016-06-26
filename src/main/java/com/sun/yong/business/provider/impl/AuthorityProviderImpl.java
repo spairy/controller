@@ -1,13 +1,16 @@
 package com.sun.yong.business.provider.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.sun.yong.business.provider.IAuthorityProvider;
 import com.sun.yong.common.entity.common.ErrorInfo;
 import com.sun.yong.common.entity.common.LogFlag;
 import com.sun.yong.common.entity.model.Friend;
 import com.sun.yong.common.entity.model.UserInfo;
 import com.sun.yong.common.entity.request.LoginRequest;
+import com.sun.yong.common.entity.response.FriendResponse;
 import com.sun.yong.common.entity.response.LoginResponse;
-import com.sun.yong.common.entity.response.UserResponse;
 import com.sun.yong.dataservice.IDataServiceSpringJDBC;
 
 public class AuthorityProviderImpl implements IAuthorityProvider {
@@ -71,19 +74,19 @@ public class AuthorityProviderImpl implements IAuthorityProvider {
 	}
 
 	@Override
-	public UserResponse getUser(String memberId, LogFlag logFlag) {
-		UserResponse userResponse = new UserResponse();
+	public FriendResponse getFriendList(String memberId, LogFlag logFlag) {
+		FriendResponse friendResponse = new FriendResponse();
 		try {
-			UserInfo userInfo = dataService.getUserInfoByMemberId(memberId);
-			Friend friend = dataService.getFriendByMemberId(memberId);
-			
-			userResponse.setUserInfo(userInfo);
-			userResponse.setFriend(friend);
+			List<Friend> friendList = dataService.getFriendByMemberId(memberId);
+			if (null == friendList) {
+				friendList = new ArrayList<Friend>();
+			}
+			friendResponse.setFriendList(friendList);
 		} catch (Exception e) {
-			userResponse.addError(new ErrorInfo("system error","provider"));
+			friendResponse.addError(new ErrorInfo("system error","provider"));
 			System.out.println(e.getMessage());
 		}
-		return userResponse;
+		return friendResponse;
 	}
 
 }
